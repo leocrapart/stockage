@@ -1,0 +1,71 @@
+extends default
+
+block body
+    h2.jumbotron.text-center Bienvenue dans l'aire de stockage
+    
+                    
+                    
+    div.container-fluid
+        div.container.mt-3
+            input.form-control#myInput(type="text" placeholder="Search..")
+            br
+        table.table.table-bordered.table-striped
+            thead
+                for data_type in data_types
+                    if data_type
+                        th=data_type
+                        
+                th
+                    form(method="POST" action="/add_data_type")
+                        input.form-control(type="text" id="new_type" name="new_type" placeholder="Add column")
+            tbody#myTable
+                for user, i in users
+                    tr
+                        - var user_length = Object.keys(user).length
+                        - var key_number1 = 0
+                        for data in user
+                            td
+                                
+                                form(method="POST" action="/update_record")
+                                    input(type="hidden" name="id_email" value=`${user.email}`)
+                                    input.form-control(type="text" name=`${data_types[key_number1]}` value=`${data}`)
+                                    - key_number1 += 1
+                        - var num_blank_cells = data_types.length - user_length
+                        - var j=0 
+                        while j<num_blank_cells
+                            form(method="POST" action="/update_user")
+                                input(type="hidden" name="id_email" value=`${user.email}`)
+                                td
+                                    - var key_number2 = Object.keys(user).length + j
+                                    input.form-control(type='text' name=`${data_types[key_number2]}`)
+                            - j += 1
+                        td
+                            form(method="POST" action="/delete_user")
+                                input(type="hidden" name="id_email" value=`${user.email}`)
+                                input.btn.btn-danger(type="submit" value="Delete")
+                    
+            
+                tr
+                    form(method="POST" action="/add_data")
+                        for data_type in data_types
+                            td
+                                input.form-control(type='text' name=`${data_type}`)
+                        td
+                            input.btn.btn-success(type="submit" value="Add")
+        
+                            
+
+        div
+            form(method="POST" action="/delete_column").float-right
+                input.form-control.form-control-sm(type="text" name="column" placeholder="delete column")
+                    
+                    
+    script.
+        $(document).ready(function(){
+          $("#myInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#myTable tr").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+          });
+        });
